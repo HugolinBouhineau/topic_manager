@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { TopicComponent } from './components/topic/topic.component';
 
 export const routes: Routes = [
   {
@@ -10,4 +11,8 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: "topic/:id",
+    component: TopicComponent
+  }
 ];

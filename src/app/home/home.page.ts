@@ -7,6 +7,7 @@ import { addIcons } from 'ionicons';
 import { trash } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { OverlayEventDetail } from '@ionic/core/components';
+import { RouterLink } from '@angular/router';
 
 addIcons({"trash":trash})
 
@@ -15,7 +16,7 @@ addIcons({"trash":trash})
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [NgFor, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal],
+  imports: [NgFor, FormsModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal],
 })
 export class HomePage {
 
@@ -33,24 +34,20 @@ export class HomePage {
     this.topicService.removeTopic(topicId);
   }
 
-  cancelModal() {
+  cancelModal(): void {
     this.modal?.dismiss(null, 'cancel');
   }
 
-  confirmModal() {
+  confirmModal(): void {
     this.modal?.dismiss(this.newTopicName, 'confirm');
   }
 
-  onWillDismiss(event: Event) {
+  onWillDismiss(event: Event): void {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
       this.topicService.newTopic("" + ev.detail.data);
     }
     this.newTopicName = "";
-  }
-
-  viewTopic(topicId: string): void {
-
   }
 
 }
