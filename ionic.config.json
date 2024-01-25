@@ -1,0 +1,7 @@
+{
+  "name": "topic_manager",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
