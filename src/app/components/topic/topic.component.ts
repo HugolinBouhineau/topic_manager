@@ -1,5 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton} from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController} from '@ionic/angular/standalone';
 import { TopicService } from '../../services/topic.service';
 import { Topic } from '../../models/topic';
 import { NgFor } from '@angular/common';
@@ -26,7 +26,7 @@ export class TopicComponent implements OnInit{
     posts: []
   };
 
-  constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController) { }
+  constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
 
   ngOnInit(): void {
     const topicId: string | null = this.route.snapshot.paramMap.get('id');
@@ -52,7 +52,19 @@ export class TopicComponent implements OnInit{
 
     if (role === 'confirm') {
       this.topicService.newPost(this.topic.id, data.name, data.description)
+      this.presentToast();
     }
+  }
+
+  async presentToast() {
+    const toast = await this.toastCtrl.create({
+      color: 'success',
+      message: 'Post créé !',
+      duration: 1500,
+      position: 'bottom',
+    });
+
+    await toast.present();
   }
 
 }

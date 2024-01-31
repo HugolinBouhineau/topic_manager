@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/models/post';
 import { Topic } from 'src/app/models/topic';
 import { TopicService } from 'src/app/services/topic.service';
-import { IonCard, IonCardContent, IonCardTitle, IonCardHeader,IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonIcon, IonButton, IonButtons, IonInput, IonModal } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardTitle, IonCardHeader,IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonIcon, IonButton, IonButtons, IonInput, IonModal, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
@@ -31,7 +31,7 @@ export class PostComponent  implements OnInit {
   newPostName: string = "";
   newPostDesc: string = "";
 
-  constructor(private route: ActivatedRoute, private topicService: TopicService) { }
+  constructor(private route: ActivatedRoute, private topicService: TopicService, private toastCtrl: ToastController) { }
 
   ngOnInit() {
     const topicId: string | null = this.route.snapshot.paramMap.get('topicId');
@@ -62,7 +62,19 @@ export class PostComponent  implements OnInit {
     if (ev.detail.role === 'confirm') {
       this.post.name = this.newPostName;
       this.post.description = this.newPostDesc;
+      this.presentToast();
     }
+  }
+
+  async presentToast() {
+    const toast = await this.toastCtrl.create({
+      color: 'success',
+      message: 'Post édité !',
+      duration: 1500,
+      position: 'bottom',
+    });
+
+    await toast.present();
   }
 
 }
