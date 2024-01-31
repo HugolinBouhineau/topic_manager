@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/models/post';
 import { Topic } from 'src/app/models/topic';
 import { TopicService } from 'src/app/services/topic.service';
-import { IonCard, IonCardContent, IonCardTitle, IonCardHeader,IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonIcon, IonButton, IonButtons, IonInput, IonModal, ToastController } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ToastController, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
-import { FormsModule } from '@angular/forms';
-import { OverlayEventDetail } from '@ionic/core/components';
+import { EditPostComponent } from 'src/app/modal/edit-post/edit-post.component';
 
 addIcons({"edit":createOutline});
 
@@ -16,11 +15,9 @@ addIcons({"edit":createOutline});
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.scss'],
   standalone: true,
-  imports: [FormsModule, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonIcon, IonButton, IonButtons, IonInput, IonModal],
+  imports: [IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput],
 })
-export class PostComponent  implements OnInit {
-
-  @ViewChild(IonModal) modal: IonModal | undefined;
+export class PostComponent {
 
   post: Post = {
     id: "-1",
@@ -31,7 +28,7 @@ export class PostComponent  implements OnInit {
   newPostName: string = "";
   newPostDesc: string = "";
 
-  constructor(private route: ActivatedRoute, private topicService: TopicService, private toastCtrl: ToastController) { }
+  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
 
   ngOnInit() {
     const topicId: string | null = this.route.snapshot.paramMap.get('topicId');
@@ -49,19 +46,20 @@ export class PostComponent  implements OnInit {
     }
   }
 
-  cancelModal() {
-    this.modal?.dismiss(null, 'cancel');
-  }
+  async openModal() {
+    const modal = await this.modalCtrl.create({
+      component: EditPostComponent,
+      componentProps: {
+        post: this.post
+      }
+    });
+    modal.present();
 
-  confirmModal() {
-    this.modal?.dismiss(null, 'confirm');
-  }
+    const { data, role } = await modal.onWillDismiss();
 
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      this.post.name = this.newPostName;
-      this.post.description = this.newPostDesc;
+    if (role === 'confirm') {
+      this.post.name = data.name;
+      this.post.description = data.description;
       this.presentToast();
     }
   }

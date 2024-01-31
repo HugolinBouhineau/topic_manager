@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './new-post.component.html',
   styleUrls: ['./new-post.component.scss'],
   standalone: true,
-  providers: [ModalController],
   imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonIcon, IonButton, IonButtons, IonInput],
 })
 export class NewPostComponent {
