@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { TopicComponent } from './components/topic/topic.component';
+import { PostComponent } from './components/post/post.component';
 
 export const routes: Routes = [
   {
@@ -14,5 +15,9 @@ export const routes: Routes = [
   {
     path: "topic/:id",
     component: TopicComponent
+  },
+  {
+    path: "topic/:topicId/:postId",
+    component: PostComponent
   }
 ];
