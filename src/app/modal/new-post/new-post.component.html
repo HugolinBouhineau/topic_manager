@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>New Post</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirm()" [strong]="true">Confirm</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input
+      label="Name"
+      labelPlacement="stacked"
+      type="text"
+      placeholder="Post name"
+      [(ngModel)]="newPost.name"
+    ></ion-input>
+    <ion-input
+    label="Description"
+    labelPlacement="stacked"
+    type="text"
+    placeholder="Post description"
+    [(ngModel)]="newPost.description"
+  ></ion-input>
+  </ion-item>
+</ion-content>

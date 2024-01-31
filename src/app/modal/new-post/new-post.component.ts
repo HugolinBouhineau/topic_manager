@@ -1,0 +1,33 @@
+import { Component } from '@angular/core';
+import { ModalController, IonInput } from '@ionic/angular/standalone';
+import { Post } from 'src/app/models/post';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonIcon, IonButton, IonButtons} from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-new-post',
+  templateUrl: './new-post.component.html',
+  styleUrls: ['./new-post.component.scss'],
+  standalone: true,
+  providers: [ModalController],
+  imports: [FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonIcon, IonButton, IonButtons, IonInput],
+})
+export class NewPostComponent {
+
+  newPost : Post = {
+    id: "-1",
+    description: "",
+    name: ""
+  }
+
+  constructor(private modalCtrl: ModalController) { }
+
+  cancel() {
+    return this.modalCtrl.dismiss(null, 'cancel');
+  }
+
+  confirm() {
+    return this.modalCtrl.dismiss(this.newPost, 'confirm');
+  }
+
+}

@@ -26,34 +26,9 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
-    <ion-modal trigger="open-topicModal" (willDismiss)="onWillDismiss($event)">
-      <ng-template>
-        <ion-header>
-          <ion-toolbar>
-            <ion-buttons slot="start">
-              <ion-button (click)="cancelModal()">Cancel</ion-button>
-            </ion-buttons>
-            <ion-title>New Topic</ion-title>
-            <ion-buttons slot="end">
-              <ion-button (click)="confirmModal()" [strong]="true">Confirm</ion-button>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding">
-          <ion-item>
-            <ion-input
-              label="Name"
-              labelPlacement="stacked"
-              type="text"
-              placeholder="Topic Name"
-              [(ngModel)]="newTopicName"
-            ></ion-input>
-          </ion-item>
-        </ion-content>
-      </ng-template>
-    </ion-modal>
   </div>
-  <ion-button id="open-topicModal" expand="block">
+  
+  <ion-button id="open-topicModal" expand="block" (click)="openModal()">
     <ion-icon name="plus"></ion-icon>
   </ion-button>
 </ion-content>

@@ -1,13 +1,13 @@
-import { Component, ViewChild } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal } from '@ionic/angular/standalone';
+import { Component } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { trash, addOutline } from 'ionicons/icons';
-import { FormsModule } from '@angular/forms';
-import { OverlayEventDetail } from '@ionic/core/components';
 import { RouterLink } from '@angular/router';
+import { ModalController } from '@ionic/angular/standalone';
+import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -16,15 +16,13 @@ addIcons({"trash":trash, "plus":addOutline})
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [NgFor, FormsModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal],
+  imports: [NgFor, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton],
 })
 export class HomePage {
 
-  @ViewChild(IonModal) modal: IonModal | undefined;
-
   newTopicName: string = "";
 
-  constructor(private topicService: TopicService) {}
+  constructor(private topicService: TopicService, private modalCtrl: ModalController) {}
 
   getTopics(): Topic[] {
     return this.topicService.getAll();
@@ -34,20 +32,17 @@ export class HomePage {
     this.topicService.removeTopic(topicId);
   }
 
-  cancelModal(): void {
-    this.modal?.dismiss(null, 'cancel');
-  }
+  async openModal() {
+    const modal = await this.modalCtrl.create({
+      component: NewTopicComponent,
+    });
+    modal.present();
 
-  confirmModal(): void {
-    this.modal?.dismiss(this.newTopicName, 'confirm');
-  }
+    const { data, role } = await modal.onWillDismiss();
 
-  onWillDismiss(event: Event): void {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      this.topicService.newTopic("" + ev.detail.data);
+    if (role === 'confirm') {
+      this.topicService.newTopic(data);
     }
-    this.newTopicName = "";
   }
 
 }

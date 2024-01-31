@@ -1,13 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal } from '@ionic/angular/standalone';
+import { Component, OnInit} from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton} from '@ionic/angular/standalone';
 import { TopicService } from '../../services/topic.service';
 import { Topic } from '../../models/topic';
 import { NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { addOutline, trash } from 'ionicons/icons';
-import { FormsModule } from '@angular/forms';
-import { OverlayEventDetail } from '@ionic/core/components';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { NewPostComponent } from 'src/app/modal/new-post/new-post.component';
+import { ModalController } from '@ionic/angular/standalone';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -16,11 +16,9 @@ addIcons({"trash":trash, "plus":addOutline})
   templateUrl: './topic.component.html',
   styleUrls: ['./topic.component.scss'],
   standalone: true,
-  imports: [NgFor, FormsModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, IonButtons, IonInput, IonModal],
+  imports: [NgFor, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton],
 })
 export class TopicComponent implements OnInit{
-
-  @ViewChild(IonModal) modal: IonModal | undefined;
 
   topic: Topic = {
     id: "-1",
@@ -28,10 +26,7 @@ export class TopicComponent implements OnInit{
     posts: []
   };
 
-  newPostName: string = "";
-  newPostDesc: string = "";
-
-  constructor(private topicService: TopicService, private route: ActivatedRoute) { }
+  constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController) { }
 
   ngOnInit(): void {
     const topicId: string | null = this.route.snapshot.paramMap.get('id');
@@ -47,21 +42,17 @@ export class TopicComponent implements OnInit{
     this.topic.posts = this.topic.posts.filter(post => post.id !== postId);
   }
 
-  cancelModal() {
-    this.modal?.dismiss(null, 'cancel');
-  }
+  async openModal() {
+    const modal = await this.modalCtrl.create({
+      component: NewPostComponent,
+    });
+    modal.present();
 
-  confirmModal() {
-    this.modal?.dismiss(null, 'confirm');
-  }
+    const { data, role } = await modal.onWillDismiss();
 
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      this.topicService.newPost(this.topic.id, this.newPostName, this.newPostDesc);
+    if (role === 'confirm') {
+      this.topicService.newPost(this.topic.id, data.name, data.description)
     }
-    this.newPostName = "";
-    this.newPostDesc = "";
   }
 
 }
