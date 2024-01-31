@@ -26,7 +26,9 @@
         </ion-item-options>
       </ion-item-sliding>
     </ion-list>
-    <ion-button id="open-postModal" expand="block">New Post</ion-button>
+    <ion-button id="open-postModal" expand="block">
+      <ion-icon name="plus"></ion-icon>
+    </ion-button>
     <ion-modal trigger="open-postModal" (willDismiss)="onWillDismiss($event)">
       <ng-template>
         <ion-header>

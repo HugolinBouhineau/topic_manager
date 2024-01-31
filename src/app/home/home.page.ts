@@ -4,12 +4,12 @@ import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash } from 'ionicons/icons';
+import { trash, addOutline } from 'ionicons/icons';
 import { FormsModule } from '@angular/forms';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { RouterLink } from '@angular/router';
 
-addIcons({"trash":trash})
+addIcons({"trash":trash, "plus":addOutline})
 
 @Component({
   selector: 'app-home',
