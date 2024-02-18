@@ -7,6 +7,7 @@ import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToo
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { EditPostComponent } from 'src/app/modal/edit-post/edit-post.component';
+import { Subscription } from 'rxjs';
 
 addIcons({"edit":createOutline});
 
@@ -27,23 +28,28 @@ export class PostComponent {
 
   newPostName: string = "";
   newPostDesc: string = "";
+  
+  sub!: Subscription;
 
   constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
 
   ngOnInit() {
     const topicId: string | null = this.route.snapshot.paramMap.get('topicId');
-    if(topicId){      
-      const topic: Topic | undefined = this.topicService.get(topicId);
-      if(topic){   
-        const postId: string | null = this.route.snapshot.paramMap.get('postId');
+    if(topicId){   
+      const postId: string | null = this.route.snapshot.paramMap.get('postId');   
+      this.sub = this.topicService.get(topicId).subscribe((topic: Topic) => {
         const post = topic.posts.find(post => post.id === postId);
         if(post){
           this.post = post;
-          this.newPostName = post.name;
-          this.newPostDesc = post.description;
+          this.newPostName = this.post.name;
+          this.newPostDesc = this.post.description;
         }
-      } 
+      })
     }
+  }
+
+  ngOnDestroy(){
+    this.sub.unsubscribe();
   }
 
   async openModal() {

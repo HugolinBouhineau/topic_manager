@@ -8,6 +8,7 @@ import { addOutline, trash } from 'ionicons/icons';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NewPostComponent } from 'src/app/modal/new-post/new-post.component';
 import { ModalController } from '@ionic/angular/standalone';
+import { Subscription } from 'rxjs';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -26,16 +27,19 @@ export class TopicComponent implements OnInit{
     posts: []
   };
 
+  sub!: Subscription;
+
   constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
 
   ngOnInit(): void {
     const topicId: string | null = this.route.snapshot.paramMap.get('id');
     if(topicId){      
-      const topic: Topic | undefined = this.topicService.get(topicId);
-      if(topic){
-        this.topic = topic;        
-      } 
+      this.sub = this.topicService.get(topicId).subscribe(topic => this.topic = topic);
     }
+  }
+
+  ngOnDestroy(){
+    this.sub.unsubscribe();
   }
 
   removePost(postId: string) : void {

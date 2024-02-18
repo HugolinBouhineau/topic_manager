@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Topic } from '../models/topic';
 import { Post } from '../models/post';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicService {
 
-  topics: Topic[] = []
+  topics$: BehaviorSubject<Topic[]> = new BehaviorSubject<Topic[]>([])
   topicIdGen: number = 1;
   postIdGen: number = 1;
 
@@ -23,31 +24,28 @@ export class TopicService {
     this.newPost("3", "Post 1", "LOLOLO");  
    }
 
-  getAll(): Topic[] {
-    return this.topics;
+  getAll(): Observable<Topic[]> {
+    return this.topics$.asObservable();
   }
 
-  get(topicId: string): Topic | undefined {
-    return this.topics.find(topic => topic.id === topicId)
+  get(topicId: string): Observable<Topic> {
+    return this.getAll().pipe(map((topics: Topic[]) => topics.find(topic => topic.id === topicId))) as Observable<Topic>
   }
 
   addTopic(topic: Topic): void {
-    this.topics.push(topic);
+    this.topics$.next([...this.topics$.getValue(), topic]);
   }
 
   removeTopic(topicId: string): void {
-    this.topics = this.topics.filter(topic => topic.id !== topicId)
+    this.topics$.next(this.topics$.getValue().filter((topic: Topic) => topic.id !== topicId));
   }
 
   addPost(post:Post, topicId: string): void {
-    this.get(topicId)?.posts.push(post);
+   this.topics$.next(this.topics$.getValue().map((topic: Topic) => topic.id === topicId ? {...topic, posts: [...topic.posts, post]} : topic))
   }
 
   removePost(postId: string, topicId:string): void {
-    const topic: Topic | undefined = this.get(topicId);
-    if (topic){
-      topic.posts = topic.posts.filter(post => post.id !== postId);
-    }
+    this.topics$.next(this.topics$.getValue().map((topic: Topic) => topic.id === topicId ? {...topic, posts: topic.posts.filter((post: Post) => post.id !== postId)} : topic))
   }
 
   newTopic(topicName: string) : void {

@@ -8,6 +8,7 @@ import { trash, addOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
+import { Subscription } from 'rxjs';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -21,11 +22,15 @@ addIcons({"trash":trash, "plus":addOutline})
 export class HomePage {
 
   newTopicName: string = "";
+  topics: Topic[] = [];
+  sub!: Subscription;
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {}
+  constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {
+    this.sub = this.topicService.getAll().subscribe((topics: Topic[]) => this.topics = topics);
+  }
 
-  getTopics(): Topic[] {
-    return this.topicService.getAll();
+  ngOnDestroy(){
+    this.sub.unsubscribe();
   }
 
   removeTopic(topicId: string): void{
