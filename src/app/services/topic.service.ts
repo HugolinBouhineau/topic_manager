@@ -38,7 +38,10 @@ export class TopicService {
   }
 
   removeTopic(topicId: string): void {
-    deleteDoc(doc(this.firestore, "topics", topicId))
+    const sub = this.getPosts(topicId).forEach((posts: Post[]) => {
+      posts.forEach((post: Post) => this.removePost(post.id, topicId))
+    });
+    deleteDoc(doc(this.firestore, "topics", topicId));
   }
 
   addPost(post: Post, topicId: string): void {
