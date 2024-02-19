@@ -43,7 +43,7 @@ export class TopicComponent implements OnInit{
   }
 
   removePost(postId: string) : void {
-    this.topic.posts = this.topic.posts.filter(post => post.id !== postId);
+    this.topicService.removePost(postId, this.topic.id);
   }
 
   async openModal() {
