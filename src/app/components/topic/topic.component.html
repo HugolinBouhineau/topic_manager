@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
+    <ion-title *ngIf="topic">
       {{this.topic.name}}
     </ion-title>
   </ion-toolbar>
@@ -14,8 +14,8 @@
   </ion-header>
 
   <div id="container">
-    <ion-list>
-      <ion-item-sliding *ngFor="let post of this.topic.posts">
+    <ion-list *ngIf="topic && posts$">
+      <ion-item-sliding *ngFor="let post of this.posts$ | async">
         <ion-item [routerLink]="['/topic', topic.id, post.id]">
           <ion-label>{{post.name}}</ion-label>
         </ion-item>

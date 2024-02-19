@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card>
+  <ion-card *ngIf="post">
     <ion-card-header>
       <ion-card-title>{{post.name}}</ion-card-title>
     </ion-card-header>

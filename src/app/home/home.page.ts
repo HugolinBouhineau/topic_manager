@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
-import { NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { trash, addOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
@@ -17,7 +17,7 @@ addIcons({"trash":trash, "plus":addOutline})
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [NgFor, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton],
+  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton],
 })
 export class HomePage {
 
@@ -26,7 +26,7 @@ export class HomePage {
   sub!: Subscription;
 
   constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {
-    this.sub = this.topicService.getAll().subscribe((topics: Topic[]) => this.topics = topics);
+    this.sub = this.topicService.getTopics().subscribe((topics: Topic[]) => this.topics = topics);
   }
 
   ngOnDestroy(){
@@ -46,7 +46,7 @@ export class HomePage {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      this.topicService.newTopic(data);
+      this.topicService.addTopic({id: "-1", name: data});
       this.presentToast();
     }
   }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/models/post';
+import { CommonModule } from '@angular/common';
 import { Topic } from 'src/app/models/topic';
 import { TopicService } from 'src/app/services/topic.service';
 import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ToastController, ModalController } from '@ionic/angular/standalone';
@@ -16,34 +17,22 @@ addIcons({"edit":createOutline});
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.scss'],
   standalone: true,
-  imports: [IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput],
+  imports: [CommonModule, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput],
 })
 export class PostComponent {
 
-  post: Post = {
-    id: "-1",
-    name:"Default Post",
-    description: "Default Post description"
-  }
-
-  newPostName: string = "";
-  newPostDesc: string = "";
-  
+  post!: Post;
+  topicId: string | null = "";
   sub!: Subscription;
 
   constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
 
   ngOnInit() {
-    const topicId: string | null = this.route.snapshot.paramMap.get('topicId');
-    if(topicId){   
-      const postId: string | null = this.route.snapshot.paramMap.get('postId');   
-      this.sub = this.topicService.get(topicId).subscribe((topic: Topic) => {
-        const post = topic.posts.find(post => post.id === postId);
-        if(post){
+    this.topicId = this.route.snapshot.paramMap.get('topicId');
+    const postId: string | null = this.route.snapshot.paramMap.get('postId'); 
+    if(this.topicId && postId){   
+      this.sub = this.topicService.getPost(this.topicId, postId).subscribe((post: Post) => {
           this.post = post;
-          this.newPostName = this.post.name;
-          this.newPostDesc = this.post.description;
-        }
       })
     }
   }
@@ -56,7 +45,11 @@ export class PostComponent {
     const modal = await this.modalCtrl.create({
       component: EditPostComponent,
       componentProps: {
-        post: this.post
+        post: {
+          id: "-1",
+          name: this.post.name,
+          description: this.post.description
+        }
       }
     });
     modal.present();
@@ -66,6 +59,7 @@ export class PostComponent {
     if (role === 'confirm') {
       this.post.name = data.name;
       this.post.description = data.description;
+      this.topicService.updatePost(this.topicId!, this.post);
       this.presentToast();
     }
   }
