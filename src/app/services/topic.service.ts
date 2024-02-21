@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Topic } from '../models/topic';
 import { Post } from '../models/post';
 import { Observable, map } from 'rxjs';
-import { CollectionReference, Firestore, addDoc, collection, collectionData, deleteDoc, doc, updateDoc } from '@angular/fire/firestore';
+import { CollectionReference, Firestore, addDoc, collection, collectionData, deleteDoc, doc, docData, updateDoc } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +22,7 @@ export class TopicService {
   }
 
   getTopic(topicId: string): Observable<Topic> {
-    return this.getTopics().pipe(map((topics: Topic[]) => topics.find(topic => topic.id === topicId))) as Observable<Topic>
+   return docData(doc(this.firestore, 'topics/' + topicId), { idField: 'id' }) as Observable<Topic>;
   }
 
   getPosts(topicId: string): Observable<Post[]> {
