@@ -15,7 +15,7 @@
 
   <div id="container">
     <ion-list>
-      <ion-item-sliding *ngFor="let topic of this.topics">
+      <ion-item-sliding *ngFor="let topic of this.topics$ | async">
         <ion-item [routerLink]="['/topic', topic.id]">
           <ion-label>{{topic.name}}</ion-label>
         </ion-item>

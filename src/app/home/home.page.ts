@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { trash, addOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -17,21 +17,14 @@ addIcons({"trash":trash, "plus":addOutline})
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton],
+  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, AsyncPipe],
 })
 export class HomePage {
 
   newTopicName: string = "";
-  topics: Topic[] = [];
-  sub!: Subscription;
+  topics$: Observable<Topic[]> = this.topicService.getTopics();
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {
-    this.sub = this.topicService.getTopics().subscribe((topics: Topic[]) => this.topics = topics);
-  }
-
-  ngOnDestroy(){
-    this.sub.unsubscribe();
-  }
+  constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {}
 
   removeTopic(topicId: string): void{
     this.topicService.removeTopic(topicId);
