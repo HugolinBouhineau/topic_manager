@@ -4,7 +4,7 @@ import { Post } from 'src/app/models/post';
 import { CommonModule } from '@angular/common';
 import { Topic } from 'src/app/models/topic';
 import { TopicService } from 'src/app/services/topic.service';
-import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ToastController, ModalController } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { EditPostComponent } from 'src/app/modal/edit-post/edit-post.component';
@@ -25,7 +25,7 @@ export class PostComponent {
   topicId: string | null = "";
   sub!: Subscription;
 
-  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
+  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController) { }
 
   ngOnInit() {
     this.topicId = this.route.snapshot.paramMap.get('topicId');
@@ -60,19 +60,7 @@ export class PostComponent {
       this.post.name = data.name;
       this.post.description = data.description;
       this.topicService.updatePost(this.topicId!, this.post);
-      this.presentToast();
     }
   }
-
-  async presentToast() {
-    const toast = await this.toastCtrl.create({
-      color: 'success',
-      message: 'Post édité !',
-      duration: 1500,
-      position: 'bottom',
-    });
-
-    await toast.present();
-  }
-
+  
 }

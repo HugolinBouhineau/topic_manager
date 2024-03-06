@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -24,7 +24,7 @@ export class HomePage {
   newTopicName: string = "";
   topics$: Observable<Topic[]> = this.topicService.getTopics();
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) {}
+  constructor(private topicService: TopicService, private modalCtrl: ModalController) {}
 
   removeTopic(topicId: string): void{
     this.topicService.removeTopic(topicId);
@@ -40,19 +40,7 @@ export class HomePage {
 
     if (role === 'confirm') {
       this.topicService.addTopic({id: "-1", name: data});
-      this.presentToast();
     }
-  }
-
-  async presentToast() {
-    const toast = await this.toastCtrl.create({
-      color: 'success',
-      message: 'Topic créé !',
-      duration: 1500,
-      position: 'bottom',
-    });
-
-    await toast.present();
   }
 
 }
