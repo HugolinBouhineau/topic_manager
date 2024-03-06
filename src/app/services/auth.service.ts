@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
+import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  private googleProvider = new GoogleAuthProvider();
 
   constructor(private auth: Auth) { }
 
@@ -14,6 +16,10 @@ export class AuthService {
   
   signIn(email: string, password: string): Promise<UserCredential>{
     return signInWithEmailAndPassword(this.auth, email, password)
+  }
+
+  signInWithGoogle(): Promise<UserCredential>{
+    return signInWithRedirect(this.auth, this.googleProvider);
   }
   
   signOut(): Promise<void>{
