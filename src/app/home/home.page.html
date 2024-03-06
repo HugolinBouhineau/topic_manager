@@ -8,15 +8,9 @@
 
 <ion-content [fullscreen]="true">
 
-  <ion-fab *ngIf="isConnected()" slot="fixed" vertical="top" horizontal="end">
+  <ion-fab slot="fixed" vertical="top" horizontal="end">
     <ion-fab-button (click)="logout()">
       <ion-icon name="logout"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
-  <ion-fab *ngIf="!isConnected()" slot="fixed" vertical="top" horizontal="end">
-    <ion-fab-button routerLink="/login">
-      <ion-icon name="login"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 

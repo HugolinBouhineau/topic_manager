@@ -4,15 +4,15 @@ import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash, addOutline, logInOutline, logOutOutline } from 'ionicons/icons';
-import { RouterLink } from '@angular/router';
+import { trash, addOutline, logOutOutline } from 'ionicons/icons';
+import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { User } from '@angular/fire/auth';
 
-addIcons({"trash":trash, "plus":addOutline, "login":logInOutline, "logout":logOutOutline})
+addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline})
 
 @Component({
   selector: 'app-home',
@@ -26,7 +26,7 @@ export class HomePage {
   newTopicName: string = "";
   topics$: Observable<Topic[]> = this.topicService.getTopics();
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService) {}
+  constructor(private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService, private router: Router) {}
 
   removeTopic(topicId: string): void{
     this.topicService.removeTopic(topicId);
@@ -34,10 +34,7 @@ export class HomePage {
 
   logout(): void {
     this.authService.signOut();
-  }
-
-  isConnected(): User | null {
-    return this.authService.isConnected();
+    this.router.navigateByUrl("/login");
   }
 
   async openModal() {
