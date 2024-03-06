@@ -1,23 +1,23 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
+import { IonFab, IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash, addOutline } from 'ionicons/icons';
+import { trash, addOutline, logInOutline } from 'ionicons/icons';
 import { RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
 import { Observable } from 'rxjs';
 
-addIcons({"trash":trash, "plus":addOutline})
+addIcons({"trash":trash, "plus":addOutline, "login":logInOutline})
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, AsyncPipe],
+  imports: [IonFab, IonFabButton, CommonModule, RouterLink, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, AsyncPipe],
 })
 export class HomePage {
 

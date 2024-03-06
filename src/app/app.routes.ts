@@ -22,5 +22,9 @@ export const routes: Routes = [
     path: "topic/:topicId/:postId",
     component: PostComponent,
     canActivate: [AuthGuard],
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('./components/register/register.page').then( m => m.RegisterPage)
   }
 ];
