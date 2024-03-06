@@ -16,7 +16,7 @@
     <ion-list>
         <ion-item class="input-item">
           <ion-label aria-label="Login" position="floating">Email</ion-label>
-          <ion-input type="text" formControlName="email" clearInput required></ion-input>
+          <ion-input type="text" formControlName="email" clearInput required aria-label="email input"></ion-input>
         </ion-item>
         <div class="error-container" *ngIf="loginForm.get('email')?.invalid">
           <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['required']">
@@ -29,7 +29,7 @@
 
         <ion-item class="input-item">
           <ion-label aria-label="Password" position="floating">Password</ion-label>
-          <ion-input type="password" formControlName="password" clearInput required></ion-input>
+          <ion-input type="password" formControlName="password" clearInput required aria-label="password input"></ion-input>
         </ion-item>
         <div class="error-container" *ngIf="loginForm.get('password')?.invalid">
           <span style="color: red;" *ngIf="loginForm.get('password')?.errors?.['required']">
