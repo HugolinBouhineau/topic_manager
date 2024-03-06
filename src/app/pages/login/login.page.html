@@ -1,0 +1,45 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Login</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+
+  <form (ngSubmit)="submit()" [formGroup]="loginForm">
+    <ion-list>
+        <ion-item class="input-item">
+          <ion-label aria-label="Login" position="floating">Email</ion-label>
+          <ion-input type="text" formControlName="email" clearInput required></ion-input>
+        </ion-item>
+        <div class="error-container" *ngIf="loginForm.get('email')?.invalid">
+          <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['required']">
+            Email is required
+          </span>
+          <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['pattern']">
+            Email is incorrect
+          </span>
+        </div>
+
+        <ion-item class="input-item">
+          <ion-label aria-label="Password" position="floating">Password</ion-label>
+          <ion-input type="password" formControlName="password" clearInput required></ion-input>
+        </ion-item>
+        <div class="error-container" *ngIf="loginForm.get('password')?.invalid">
+          <span style="color: red;" *ngIf="loginForm.get('password')?.errors?.['required']">
+            Password is required
+          </span>
+        </div>
+
+        <ion-button style="display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
+    </ion-list>
+    <ion-button type="submit" style="display: flex; align-items: center;" [disabled]="loginForm.invalid" class="submit-button">Login</ion-button>
+
+  </form>
+</ion-content>
