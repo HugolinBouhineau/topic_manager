@@ -28,7 +28,9 @@ export class LoginPage  {
     if (email && password) {
       this.authService.signIn(email, password).then(res => {
         this.router.navigate(['/home']);
-      }).catch(rr => console.log(rr));
+      }).catch(err => {
+        this.loginForm.setErrors({ wrongCredentials: true })
+      });
     }
   }
 

@@ -26,6 +26,9 @@
             Email is incorrect
           </span>
         </div>
+        <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
+          Wrong credentials
+        </span>
 
         <ion-item class="input-item">
           <ion-label aria-label="Password" position="floating">Password</ion-label>
@@ -36,6 +39,9 @@
             Password is required
           </span>
         </div>
+        <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
+          Wrong credentials
+        </span>
 
         <ion-button style="display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
     </ion-list>
