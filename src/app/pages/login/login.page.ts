@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
-import { IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList } from '@ionic/angular/standalone'
+import { IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList, IonFabButton, IonIcon, IonFab, IonRow } from '@ionic/angular/standalone'
 import { AuthService } from 'src/app/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { logoGoogle } from 'ionicons/icons';
+
+addIcons({"logo-google": logoGoogle})
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [RouterLink, IonList, CommonModule, FormsModule, IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, ReactiveFormsModule]
+  imports: [IonRow, IonFab, IonIcon, IonFabButton, RouterLink, IonList, CommonModule, FormsModule, IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, ReactiveFormsModule]
 })
-export class LoginPage  {
+
+export class LoginPage {
   loginForm = new FormGroup({
     email: new FormControl('', Validators.compose([
       Validators.required,
@@ -36,6 +41,12 @@ export class LoginPage  {
 
   toRegisterPage() {
     this.router.navigate(['/register'])
+  }
+
+  loginWithGmail(): void {
+    this.authService.signInWithGoogle().then(res => {
+      this.router.navigate(['/home']);
+    })
   }
 
 }

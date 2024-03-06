@@ -45,6 +45,12 @@
 
         <ion-button style="display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
     </ion-list>
+    <ion-fab position="vertical" horizontal="center">
+      <ion-fab-button (click)="loginWithGmail()">
+        <ion-icon name="logo-google"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+    <ion-button style="margin-top: 18%; display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
     <ion-button type="submit" style="display: flex; align-items: center;" [disabled]="loginForm.invalid" class="submit-button">Login</ion-button>
 
   </form>
