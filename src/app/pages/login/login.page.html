@@ -42,8 +42,6 @@
         <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
           Wrong credentials
         </span>
-
-        <ion-button style="display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
     </ion-list>
     <ion-fab position="vertical" horizontal="center">
       <ion-fab-button (click)="loginWithGmail()">
