@@ -33,8 +33,7 @@ export class HomePage {
   }
 
   logout(): void {
-    this.authService.signOut();
-    this.router.navigateByUrl("/login");
+    this.authService.signOut().then(res =>  this.router.navigateByUrl("/login"));
   }
 
   async openModal() {
