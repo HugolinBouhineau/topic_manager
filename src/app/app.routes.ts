@@ -33,5 +33,9 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () => import('./components/register/register.page').then( m => m.RegisterPage),
     canActivate: [LogGuard],
+  },
+  {
+    path: 'forget-password',
+    loadComponent: () => import('./pages/forget-password/forget-password.page').then( m => m.ForgetPasswordPage)
   }
 ];

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect } from '@angular/fire/auth';
+import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, sendPasswordResetEmail } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class AuthService {
   createUser(email: string, password: string): Promise<UserCredential>{
     return createUserWithEmailAndPassword(this.auth, email, password)
   }
-  
+
   signIn(email: string, password: string): Promise<UserCredential>{
     return signInWithEmailAndPassword(this.auth, email, password)
   }
@@ -21,11 +21,15 @@ export class AuthService {
   signInWithGoogle(): Promise<UserCredential>{
     return signInWithRedirect(this.auth, this.googleProvider);
   }
-  
+
+  sendPasswordResetEmail(email: string): Promise<void> {
+    return sendPasswordResetEmail(this.auth, email);
+  }
+
   signOut(): Promise<void>{
     return signOut(this.auth)
   }
-  
+
   isConnected(): User | null {
     return this.auth.currentUser;
   }

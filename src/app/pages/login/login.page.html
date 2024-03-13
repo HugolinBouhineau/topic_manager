@@ -22,9 +22,6 @@
           <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['required']">
             Email is required
           </span>
-          <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['pattern']">
-            Email is incorrect
-          </span>
         </div>
         <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
           Wrong credentials
@@ -49,6 +46,7 @@
       </ion-fab-button>
     </ion-fab>
     <ion-button style="margin-top: 18%; display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
+    <ion-button style="margin-top: 1%; display: flex; align-items: center;" fill="clear" (click)="resetPassword()">I forgot my password</ion-button>
     <ion-button type="submit" style="display: flex; align-items: center;" [disabled]="loginForm.invalid" class="submit-button">Login</ion-button>
 
   </form>

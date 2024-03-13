@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
 import { IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList, IonFabButton, IonIcon, IonFab, IonRow } from '@ionic/angular/standalone'
@@ -21,7 +21,6 @@ export class LoginPage {
   loginForm = new FormGroup({
     email: new FormControl('', Validators.compose([
       Validators.required,
-      Validators.pattern('^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$')
     ])),
     password: new FormControl('', Validators.required)
   });
@@ -40,7 +39,11 @@ export class LoginPage {
   }
 
   toRegisterPage() {
-    this.router.navigate(['/register'])
+    this.router.navigate(['/register']);
+  }
+
+  resetPassword() {
+    this.router.navigate(['/forget-password']);
   }
 
   loginWithGmail(): void {
