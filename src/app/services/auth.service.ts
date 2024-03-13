@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, sendPasswordResetEmail } from '@angular/fire/auth';
+import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, sendPasswordResetEmail, sendEmailVerification } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +24,10 @@ export class AuthService {
 
   sendPasswordResetEmail(email: string): Promise<void> {
     return sendPasswordResetEmail(this.auth, email);
+  }
+
+  sendEmailVerification(user: User): Promise<void> {
+    return sendEmailVerification(user);
   }
 
   signOut(): Promise<void>{
