@@ -1,67 +1,119 @@
 import { Injectable } from '@angular/core';
 import { Topic } from '../models/topic';
 import { Post } from '../models/post';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { CollectionReference, Firestore, addDoc, arrayRemove, arrayUnion, collection, collectionData, deleteDoc, doc, docData, or, query, updateDoc, where } from '@angular/fire/firestore';
+import { ToastController } from '@ionic/angular/standalone';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicService {
 
-  topics$: BehaviorSubject<Topic[]> = new BehaviorSubject<Topic[]>([])
-  topicIdGen: number = 1;
-  postIdGen: number = 1;
+  topicsCollection: CollectionReference;
 
-  constructor() {
-    this.newTopic("Topic 1");
-    this.newPost("1", "Post 1", "LOLOLO");
-    this.newPost("1", "Post 3", "LOLOLO");
-
-    this.newTopic("Topic 2");
-    this.newPost("2", "Post 1", "LOLOLO");
-
-    this.newTopic("Topic 3");
-    this.newPost("3", "Post 1", "LOLOLO");  
+  constructor(private firestore: Firestore, private toastCtrl: ToastController, private auth: AuthService) {
+    this.topicsCollection = collection(this.firestore, 'topics');
    }
 
-  getAll(): Observable<Topic[]> {
-    return this.topics$.asObservable();
+  getTopics(): Observable<Topic[]> {
+    return collectionData(query(this.topicsCollection,
+      or(where('owner', '==', this.auth.isConnected() ? this.auth.isConnected()?.email:""),
+      where('readers', "array-contains", this.auth.isConnected() ? this.auth.isConnected()?.email:""),
+      where('editors', "array-contains", this.auth.isConnected() ? this.auth.isConnected()?.email:"")))
+    , { idField: 'id' }) as Observable<Topic[]>;
   }
 
-  get(topicId: string): Observable<Topic> {
-    return this.getAll().pipe(map((topics: Topic[]) => topics.find(topic => topic.id === topicId))) as Observable<Topic>
+  getTopic(topicId: string): Observable<Topic> {
+   return docData(doc(this.firestore, 'topics/' + topicId), { idField: 'id' }) as Observable<Topic>;
   }
 
-  addTopic(topic: Topic): void {
-    this.topics$.next([...this.topics$.getValue(), topic]);
+  getPosts(topicId: string): Observable<Post[]> {
+    return collectionData(collection(this.firestore, "topics/" + topicId + "/posts"), { idField: 'id' }) as Observable<Post[]>;
   }
 
-  removeTopic(topicId: string): void {
-    this.topics$.next(this.topics$.getValue().filter((topic: Topic) => topic.id !== topicId));
+  getPost(topicId: string, postId: string): Observable<Post> {
+    return docData(doc(this.firestore, 'topics/' + topicId + "/posts/" + postId), { idField: 'id' }) as Observable<Post>;
+  }
+  
+  addTopic(topicName: string): void {
+    addDoc(this.topicsCollection, { name: topicName, owner: this.auth.isConnected() ? this.auth.isConnected()?.email:"", readers: [], editors:[] });
+    this.presentToast('success', 'Topic successfully created');
   }
 
-  addPost(post:Post, topicId: string): void {
-   this.topics$.next(this.topics$.getValue().map((topic: Topic) => topic.id === topicId ? {...topic, posts: [...topic.posts, post]} : topic))
+  removeTopic(topic: Topic): void {
+    const user = this.auth.isConnected();
+    if(user && user.email == topic.owner){
+      const sub = this.getPosts(topic.id).forEach((posts: Post[]) => {
+        posts.forEach((post: Post) => this.removePost(post.id, topic))
+      });
+      deleteDoc(doc(this.firestore, "topics", topic.id));
+      this.presentToast('success', 'Topic successfully deleted');
+    }else{
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
   }
 
-  removePost(postId: string, topicId:string): void {
-    this.topics$.next(this.topics$.getValue().map((topic: Topic) => topic.id === topicId ? {...topic, posts: topic.posts.filter((post: Post) => post.id !== postId)} : topic))
+  addPost(post: Post, topic: Topic): void {
+    const user = this.auth.isConnected();
+    if(user && (user.email == topic.owner || (topic.editors as (string | null)[]).includes(user.email))){
+      addDoc(collection(this.firestore, "topics/" + topic.id + "/posts"), {name: post.name, description: post.description });
+      this.presentToast('success', 'Post successfully created');
+    }else{
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
   }
 
-  newTopic(topicName: string) : void {
-    this.addTopic({
-      id: "" + this.topicIdGen++,
-      name: topicName,
-      posts: []
-    })
+  removePost(postId: string, topic: Topic): void {
+    const user = this.auth.isConnected();
+    if(user && (user.email == topic.owner || (topic.editors as (string | null)[]).includes(user.email))){
+      deleteDoc(doc(this.firestore, "topics/" + topic.id + "/posts", postId))
+      this.presentToast('success', 'Post successfully deleted');
+    }else{
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
   }
 
-  newPost(topicId: string, postName: string, postDesc: string): void {
-    this.addPost({
-      id: "" + this.postIdGen++,
-      name: postName,
-      description: postDesc
-    }, topicId)
+  updatePost(topic: Topic, post: Post): void {
+    const user = this.auth.isConnected();
+    if(user && (user.email == topic.owner || (topic.editors as (string | null)[]).includes(user.email))){
+      updateDoc(doc(this.firestore, "topics/" + topic.id + "/posts", post.id), { name: post.name, description: post.description })
+      this.presentToast('success', 'Post successfully updated');
+    }else{
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
+  }
+
+  addNewReader(topicId: string, editorName: string){
+    updateDoc(doc(this.firestore, "topics", topicId), { readers: arrayUnion(editorName) })
+    this.presentToast('success', 'Reader successfully added');
+  }
+
+  addNewEditor(topicId: string, editorName: string){
+    updateDoc(doc(this.firestore, "topics", topicId), { editors: arrayUnion(editorName) })
+    this.presentToast('success', 'Editor successfully added');
+  }
+
+  deleteReader(topicId: string, readerName: string){
+    updateDoc(doc(this.firestore, "topics", topicId), { readers: arrayRemove(readerName) })
+    this.presentToast('success', 'Reader successfully removed');
+  }
+
+  deleteEditor(topicId: string, readerName: string){
+    updateDoc(doc(this.firestore, "topics", topicId), { editors: arrayRemove(readerName) })
+    this.presentToast('success', 'Editor successfully removed');
+  }
+
+  private async presentToast(color: 'success' | 'danger', message: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      color,
+      duration: 1500,
+      position: 'bottom',
+    });
+
+    await toast.present();
   }
 
 }

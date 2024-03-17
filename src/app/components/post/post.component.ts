@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Post } from 'src/app/models/post';
+import { CommonModule } from '@angular/common';
 import { Topic } from 'src/app/models/topic';
 import { TopicService } from 'src/app/services/topic.service';
-import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ToastController, ModalController } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { EditPostComponent } from 'src/app/modal/edit-post/edit-post.component';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 addIcons({"edit":createOutline});
 
@@ -16,47 +18,45 @@ addIcons({"edit":createOutline});
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.scss'],
   standalone: true,
-  imports: [IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput],
+  imports: [CommonModule, IonCard, IonCardContent, IonCardTitle, IonCardHeader, IonHeader, IonToolbar, IonTitle, IonContent, IonIcon, IonButton, IonButtons, IonInput],
 })
 export class PostComponent {
 
-  post: Post = {
-    id: "-1",
-    name:"Default Post",
-    description: "Default Post description"
-  }
-
-  newPostName: string = "";
-  newPostDesc: string = "";
-  
+  post!: Post;
+  topic!: Topic;
   sub!: Subscription;
+  sub2!: Subscription;
 
-  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private toastCtrl: ToastController) { }
+  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private auth: AuthService) { }
 
   ngOnInit() {
-    const topicId: string | null = this.route.snapshot.paramMap.get('topicId');
-    if(topicId){   
-      const postId: string | null = this.route.snapshot.paramMap.get('postId');   
-      this.sub = this.topicService.get(topicId).subscribe((topic: Topic) => {
-        const post = topic.posts.find(post => post.id === postId);
-        if(post){
-          this.post = post;
-          this.newPostName = this.post.name;
-          this.newPostDesc = this.post.description;
-        }
-      })
+    const topicId = this.route.snapshot.paramMap.get('topicId');
+    const postId: string | null = this.route.snapshot.paramMap.get('postId'); 
+    if(topicId && postId){   
+      this.sub2 = this.topicService.getTopic(topicId).subscribe((topic: Topic) => this.topic = topic)
+      this.sub = this.topicService.getPost(topicId, postId).subscribe((post: Post) => this.post = post)
     }
   }
 
   ngOnDestroy(){
     this.sub.unsubscribe();
+    this.sub2.unsubscribe();
+  }
+
+  canEditPost(){
+    const user = this.auth.isConnected()
+    return user && this.topic && (user.email == this.topic.owner || (this.topic.editors as (string | null)[]).includes(user.email))
   }
 
   async openModal() {
     const modal = await this.modalCtrl.create({
       component: EditPostComponent,
       componentProps: {
-        post: this.post
+        post: {
+          id: "-1",
+          name: this.post.name,
+          description: this.post.description
+        }
       }
     });
     modal.present();
@@ -66,19 +66,8 @@ export class PostComponent {
     if (role === 'confirm') {
       this.post.name = data.name;
       this.post.description = data.description;
-      this.presentToast();
+      this.topicService.updatePost(this.topic, this.post);
     }
   }
-
-  async presentToast() {
-    const toast = await this.toastCtrl.create({
-      color: 'success',
-      message: 'Post édité !',
-      duration: 1500,
-      position: 'bottom',
-    });
-
-    await toast.present();
-  }
-
+  
 }
