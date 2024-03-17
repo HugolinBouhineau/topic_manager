@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonFab, IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
+import { IonFab, IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -26,10 +26,10 @@ export class HomePage {
   newTopicName: string = "";
   topics$: Observable<Topic[]> = this.topicService.getTopics();
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService, private router: Router) {}
+  constructor(private toastCtrl: ToastController, private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService, private router: Router) {}
 
-  removeTopic(topicId: string): void{
-    this.topicService.removeTopic(topicId);
+  removeTopic(topic: Topic): void{
+    this.topicService.removeTopic(topic);
   }
 
   logout(): void {
@@ -38,15 +38,19 @@ export class HomePage {
   }
 
   async editOptions(topic: Topic) {
-
-    this.topicService.getTopic(topic.id)
-    const modal = await this.modalCtrl.create({
-      component: EditOptionsComponent,
-      componentProps: {
-        topic: topic
-      }
-    });
-    modal.present();
+    const user = this.authService.isConnected();
+    if(user && user.email == topic.owner){
+      this.topicService.getTopic(topic.id)
+      const modal = await this.modalCtrl.create({
+        component: EditOptionsComponent,
+        componentProps: {
+          topic: topic
+        }
+      });
+      modal.present();
+    } else {
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
   }
 
   async openModal() {
@@ -60,6 +64,17 @@ export class HomePage {
     if (role === 'confirm') {
       this.topicService.addTopic(data);
     }
+  }
+
+  private async presentToast(color: 'success' | 'danger', message: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      color,
+      duration: 1500,
+      position: 'bottom',
+    });
+
+    await toast.present();
   }
 
 }

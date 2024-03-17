@@ -9,6 +9,7 @@ import { addIcons } from 'ionicons';
 import { createOutline } from 'ionicons/icons';
 import { EditPostComponent } from 'src/app/modal/edit-post/edit-post.component';
 import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 addIcons({"edit":createOutline});
 
@@ -22,23 +23,29 @@ addIcons({"edit":createOutline});
 export class PostComponent {
 
   post!: Post;
-  topicId: string | null = "";
+  topic!: Topic;
   sub!: Subscription;
+  sub2!: Subscription;
 
-  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController) { }
+  constructor(private route: ActivatedRoute, private topicService: TopicService, private modalCtrl: ModalController, private auth: AuthService) { }
 
   ngOnInit() {
-    this.topicId = this.route.snapshot.paramMap.get('topicId');
+    const topicId = this.route.snapshot.paramMap.get('topicId');
     const postId: string | null = this.route.snapshot.paramMap.get('postId'); 
-    if(this.topicId && postId){   
-      this.sub = this.topicService.getPost(this.topicId, postId).subscribe((post: Post) => {
-          this.post = post;
-      })
+    if(topicId && postId){   
+      this.sub2 = this.topicService.getTopic(topicId).subscribe((topic: Topic) => this.topic = topic)
+      this.sub = this.topicService.getPost(topicId, postId).subscribe((post: Post) => this.post = post)
     }
   }
 
   ngOnDestroy(){
     this.sub.unsubscribe();
+    this.sub2.unsubscribe();
+  }
+
+  canEditPost(){
+    const user = this.auth.isConnected()
+    return user && this.topic && (user.email == this.topic.owner || (this.topic.editors as (string | null)[]).includes(user.email))
   }
 
   async openModal() {
@@ -59,7 +66,7 @@ export class PostComponent {
     if (role === 'confirm') {
       this.post.name = data.name;
       this.post.description = data.description;
-      this.topicService.updatePost(this.topicId!, this.post);
+      this.topicService.updatePost(this.topic, this.post);
     }
   }
   

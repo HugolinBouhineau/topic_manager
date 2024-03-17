@@ -17,7 +17,7 @@
     <div id="container">
       <ion-toolbar>
         <ion-buttons slot="end">
-          <ion-button fill="solid" shape="round" color="primary" id="open-post-edit-Modal" expand="block" (click)="openModal()">
+          <ion-button *ngIf="canEditPost()" fill="solid" shape="round" color="primary" id="open-post-edit-Modal" expand="block" (click)="openModal()">
             <ion-icon name="edit" aria-hidden="true"></ion-icon>
           </ion-button>
         </ion-buttons>

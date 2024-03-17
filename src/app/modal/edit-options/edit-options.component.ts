@@ -6,6 +6,7 @@ import { TopicService } from 'src/app/services/topic.service';
 import { trash } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 addIcons({"trash":trash})
 
@@ -21,12 +22,15 @@ export class EditOptionsComponent implements OnInit{
   topic!: Topic
   newReader: string = ""
   newEditor: string = ""
+  sub!: Subscription;
 
   constructor(private modalCtrl: ModalController, private topicService: TopicService) {}
   ngOnInit(): void {
-    this.topicService.getTopic(this.topic.id).subscribe((topic: Topic) => {
-      this.topic = topic;
-    }) 
+    this.sub = this.topicService.getTopic(this.topic.id).subscribe((topic: Topic) => this.topic = topic) 
+  }
+
+  ngOnDestroy(){
+    this.sub.unsubscribe();
   }
 
   cancel() {

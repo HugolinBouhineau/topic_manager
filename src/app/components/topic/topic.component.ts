@@ -10,6 +10,7 @@ import { NewPostComponent } from 'src/app/modal/new-post/new-post.component';
 import { ModalController } from '@ionic/angular/standalone';
 import { Observable, Subscription } from 'rxjs';
 import { Post } from 'src/app/models/post';
+import { AuthService } from 'src/app/services/auth.service';
 
 addIcons({"trash":trash, "plus":addOutline})
 
@@ -26,7 +27,7 @@ export class TopicComponent implements OnInit{
   posts$!:Observable<Post[]> ;
   sub!: Subscription;
 
-  constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController) { }
+  constructor(private topicService: TopicService, private route: ActivatedRoute, private modalCtrl: ModalController, private auth: AuthService) { }
 
   ngOnInit(): void {
     const topicId: string | null = this.route.snapshot.paramMap.get('id');
@@ -41,7 +42,12 @@ export class TopicComponent implements OnInit{
   }
 
   removePost(postId: string) : void {
-    this.topicService.removePost(postId, this.topic.id);
+    this.topicService.removePost(postId, this.topic);
+  }
+
+  canAddTopic(){
+    const user = this.auth.isConnected()
+    return user && this.topic && (user.email == this.topic.owner || (this.topic.editors as (string | null)[]).includes(user.email))
   }
 
   async openModal() {
@@ -53,7 +59,7 @@ export class TopicComponent implements OnInit{
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      this.topicService.addPost({id: "-1", name: data.name, description: data.description}, this.topic.id);
+      this.topicService.addPost({id: "-1", name: data.name, description: data.description}, this.topic);
     }
   }
 }
