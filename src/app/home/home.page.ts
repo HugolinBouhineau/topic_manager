@@ -4,7 +4,7 @@ import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash, addOutline, logOutOutline, settingsOutline } from 'ionicons/icons';
+import { trash, addOutline, logOutOutline, settingsOutline, pencilOutline, eyeOutline, personOutline } from 'ionicons/icons';
 import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
@@ -12,7 +12,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { EditOptionsComponent } from '../modal/edit-options/edit-options.component';
 
-addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline, "settings":settingsOutline})
+addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline, "settings":settingsOutline, "pencil":pencilOutline, "eye":eyeOutline, "person":personOutline })
 
 @Component({
   selector: 'app-home',
@@ -35,6 +35,19 @@ export class HomePage {
   logout(): void {
     this.authService.signOut();
     this.router.navigateByUrl("/login");
+  }
+
+  iconToShow(topic: Topic): string {
+    const user = this.authService.isConnected();
+    if(user){
+      if(user.email === topic.owner)
+        return "person"
+      else if ((topic.editors as (string | null)[]).includes(user.email))
+        return "pencil"
+      else if ((topic.readers as (string | null)[]).includes(user.email))
+        return "eye"
+    }
+    return ""
   }
 
   async editOptions(topic: Topic) {

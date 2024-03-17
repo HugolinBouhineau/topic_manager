@@ -25,6 +25,7 @@
       <ion-item-sliding *ngFor="let topic of this.topics$ | async">
         <ion-item [routerLink]="['/topic', topic.id]">
           <ion-label>{{topic.name}}</ion-label>
+          <ion-icon name="{{iconToShow(topic)}}"></ion-icon>
         </ion-item>
         <ion-item-options>
           <ion-item-option color="primary" (click)="editOptions(topic)">
