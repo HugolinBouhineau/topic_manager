@@ -33,8 +33,8 @@ export class HomePage {
   }
 
   logout(): void {
-    this.authService.signOut();
-    this.router.navigateByUrl("/login");
+    this.topics$ = new Observable;
+    this.authService.signOut().then(res => this.router.navigateByUrl("/login"))
   }
 
   iconToShow(topic: Topic): string {
