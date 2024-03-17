@@ -37,6 +37,7 @@ export class LoginPage {
       this.authService.signIn(email, password).then(res => {
         if (!this.authService.isConnected()?.emailVerified) {
           this.presentToast("Your email is not verified !")
+          this.authService.signOut();
         } else {
           this.router.navigate(['/home']);
         }

@@ -4,15 +4,15 @@ import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash, addOutline, logOutOutline } from 'ionicons/icons';
+import { trash, addOutline, logOutOutline, settingsOutline } from 'ionicons/icons';
 import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { User } from '@angular/fire/auth';
+import { EditOptionsComponent } from '../modal/edit-options/edit-options.component';
 
-addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline})
+addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline, "settings":settingsOutline})
 
 @Component({
   selector: 'app-home',
@@ -37,6 +37,18 @@ export class HomePage {
     this.router.navigateByUrl("/login");
   }
 
+  async editOptions(topic: Topic) {
+
+    this.topicService.getTopic(topic.id)
+    const modal = await this.modalCtrl.create({
+      component: EditOptionsComponent,
+      componentProps: {
+        topic: topic
+      }
+    });
+    modal.present();
+  }
+
   async openModal() {
     const modal = await this.modalCtrl.create({
       component: NewTopicComponent,
@@ -46,7 +58,7 @@ export class HomePage {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      this.topicService.addTopic({id: "-1", name: data});
+      this.topicService.addTopic(data);
     }
   }
 
