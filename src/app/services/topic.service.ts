@@ -30,11 +30,11 @@ export class TopicService {
   }
 
   getPosts(topicId: string): Observable<Post[]> {
-    return collectionData(collection(this.firestore, "topics/"+topicId+"/posts"), { idField: 'id' }) as Observable<Post[]>;
+    return collectionData(collection(this.firestore, "topics/" + topicId + "/posts"), { idField: 'id' }) as Observable<Post[]>;
   }
 
   getPost(topicId: string, postId: string): Observable<Post> {
-    return this.getPosts(topicId).pipe(map((posts: Post[]) => posts.find(post => post.id === postId))) as Observable<Post>
+    return docData(doc(this.firestore, 'topics/' + topicId + "/posts/" + postId), { idField: 'id' }) as Observable<Post>;
   }
   
   addTopic(topicName: string): void {
