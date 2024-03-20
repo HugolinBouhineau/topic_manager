@@ -32,15 +32,12 @@ export class RegisterPage implements OnInit {
   register(): void {
     const {email, password} = this.registerForm.getRawValue();
     this.authService.createUser(email, password).then(res => {
-      if (res.user) {
-        this.authService.sendEmailVerification(res.user).then(res => {
-          this.authService.signOut();
-          this.router.navigate(['/login']);
-        }).catch(err => {
-          this.presentToast("Your email was not found");
-          this.authService.signOut();
-        });
-      }
+      this.authService.sendEmailVerification(res.user).then(res => {
+        this.authService.signOut().then(res => this.router.navigate(['/login']));
+      }).catch(err => {
+        this.presentToast("Your email was not found");
+        this.authService.signOut();
+      });
     }).catch(err => {
       this.presentToast("Your email is already used")
     });
