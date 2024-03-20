@@ -32,9 +32,8 @@ export class RegisterPage implements OnInit {
   register(): void {
     const {email, password} = this.registerForm.getRawValue();
     this.authService.createUser(email, password).then(res => {
-      const user = this.authService.isConnected();
-      if (user) {
-        this.authService.sendEmailVerification(user).then(res => {
+      if (res.user) {
+        this.authService.sendEmailVerification(res.user).then(res => {
           this.authService.signOut();
           this.router.navigate(['/login']);
         }).catch(err => {
