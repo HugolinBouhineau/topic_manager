@@ -35,8 +35,9 @@ export class RegisterPage implements OnInit {
       const user = this.authService.isConnected();
       if (user) {
         this.authService.sendEmailVerification(user).then(res => {
-          this.authService.signOut();
-          this.router.navigate(['/login']);
+          console.log("email verification send !")
+          this.authService.signOut().then(res => {this.router.navigate(['/login']);});
+
         }).catch(err => {
           this.presentToast("Your email was not found");
           this.authService.signOut();
