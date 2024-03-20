@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
-import { IonFab, IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton } from '@ionic/angular/standalone';
+import { IonFab, IonFabButton, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItemSliding, IonItem, IonLabel, IonItemOption, IonItemOptions, IonIcon, IonButton, ToastController } from '@ionic/angular/standalone';
 import { TopicService } from '../services/topic.service';
 import { Topic } from '../models/topic';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { trash, addOutline, logOutOutline } from 'ionicons/icons';
+import { trash, addOutline, logOutOutline, settingsOutline, pencilOutline, eyeOutline, personOutline } from 'ionicons/icons';
 import { Router, RouterLink } from '@angular/router';
 import { ModalController } from '@ionic/angular/standalone';
 import { NewTopicComponent } from '../modal/new-topic/new-topic.component';
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { User } from '@angular/fire/auth';
+import { EditOptionsComponent } from '../modal/edit-options/edit-options.component';
 
-addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline})
+addIcons({"trash":trash, "plus":addOutline, "logout":logOutOutline, "settings":settingsOutline, "pencil":pencilOutline, "eye":eyeOutline, "person":personOutline })
 
 @Component({
   selector: 'app-home',
@@ -26,14 +26,44 @@ export class HomePage {
   newTopicName: string = "";
   topics$: Observable<Topic[]> = this.topicService.getTopics();
 
-  constructor(private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService, private router: Router) {}
+  constructor(private toastCtrl: ToastController, private topicService: TopicService, private modalCtrl: ModalController, private authService: AuthService, private router: Router) {}
 
-  removeTopic(topicId: string): void{
-    this.topicService.removeTopic(topicId);
+  removeTopic(topic: Topic): void{
+    this.topicService.removeTopic(topic);
   }
 
   logout(): void {
-    this.authService.signOut().then(res =>  this.router.navigateByUrl("/login"));
+    this.topics$ = new Observable;
+    this.authService.signOut().then(res => this.router.navigateByUrl("/login"))
+  }
+
+  iconToShow(topic: Topic): string {
+    const user = this.authService.isConnected();
+    if(user){
+      if(user.email === topic.owner)
+        return "person"
+      else if ((topic.editors as (string | null)[]).includes(user.email))
+        return "pencil"
+      else if ((topic.readers as (string | null)[]).includes(user.email))
+        return "eye"
+    }
+    return ""
+  }
+
+  async editOptions(topic: Topic) {
+    const user = this.authService.isConnected();
+    if(user && user.email == topic.owner){
+      this.topicService.getTopic(topic.id)
+      const modal = await this.modalCtrl.create({
+        component: EditOptionsComponent,
+        componentProps: {
+          topic: topic
+        }
+      });
+      modal.present();
+    } else {
+      this.presentToast('danger', "You don't have the permissions to do that");
+    }
   }
 
   async openModal() {
@@ -45,8 +75,19 @@ export class HomePage {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      this.topicService.addTopic({id: "-1", name: data});
+      this.topicService.addTopic(data);
     }
+  }
+
+  private async presentToast(color: 'success' | 'danger', message: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      color,
+      duration: 1500,
+      position: 'bottom',
+    });
+
+    await toast.present();
   }
 
 }

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule } from '@angular/forms';
-import { IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList, IonFabButton, IonIcon, IonFab, IonRow } from '@ionic/angular/standalone'
+import { IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonList, IonFabButton, IonIcon, IonFab, IonRow, ToastController } from '@ionic/angular/standalone'
 import { AuthService } from 'src/app/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
@@ -21,18 +21,26 @@ export class LoginPage {
   loginForm = new FormGroup({
     email: new FormControl('', Validators.compose([
       Validators.required,
-      Validators.pattern('^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$')
     ])),
     password: new FormControl('', Validators.required)
   });
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastController: ToastController
+    ) { }
 
   submit(): void {
     const { email, password } = this.loginForm.getRawValue();
     if (email && password) {
       this.authService.signIn(email, password).then(res => {
-        this.router.navigate(['/home']);
+        if (!this.authService.isConnected()?.emailVerified) {
+          this.presentToast("Your email is not verified !")
+          this.authService.signOut();
+        } else {
+          this.router.navigate(['/home']);
+        }
       }).catch(err => {
         this.loginForm.setErrors({ wrongCredentials: true })
       });
@@ -40,13 +48,26 @@ export class LoginPage {
   }
 
   toRegisterPage() {
-    this.router.navigate(['/register'])
+    this.router.navigate(['/register']);
+  }
+
+  resetPassword() {
+    this.router.navigate(['/forget-password']);
   }
 
   loginWithGmail(): void {
     this.authService.signInWithGoogle().then(res => {
       this.router.navigate(['/home']);
     })
+  }
+
+  async presentToast(msg: string) {
+    const toast = await this.toastController.create({
+      message: msg,
+      duration: 3000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 }
