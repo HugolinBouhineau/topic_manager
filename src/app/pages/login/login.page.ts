@@ -6,6 +6,9 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { logoGoogle } from 'ionicons/icons';
+import {NgxSnakeModule} from 'ngx-snake';
+import { PluginListenerHandle } from '@capacitor/core';
+import { Motion } from '@capacitor/motion';
 
 addIcons({"logo-google": logoGoogle})
 
@@ -14,7 +17,7 @@ addIcons({"logo-google": logoGoogle})
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonRow, IonFab, IonIcon, IonFabButton, RouterLink, IonList, CommonModule, FormsModule, IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, ReactiveFormsModule]
+  imports: [NgxSnakeModule, IonRow, IonFab, IonIcon, IonFabButton, RouterLink, IonList, CommonModule, FormsModule, IonInput, IonItem, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, ReactiveFormsModule]
 })
 
 export class LoginPage {
@@ -25,11 +28,30 @@ export class LoginPage {
     password: new FormControl('', Validators.required)
   });
 
+  showSnake: boolean = false;
+  accelHandler!: PluginListenerHandle;
+  log: string = "";
+  delay: boolean = true;
+
   constructor(
     private authService: AuthService,
     private router: Router,
     private toastController: ToastController
-    ) { }
+    ) { this.snake() }
+
+  async snake(){
+    // Once the user approves, can start listening:
+    this.accelHandler = await Motion.addListener('accel', event => {
+      //this.log = "accelx : " + event.acceleration.x +"\naccely : "+event.acceleration.y +"\naccelz : "+event.acceleration.z +"\n";
+      if(this.delay && Math.sqrt(Math.pow(event.acceleration.x, 2) + Math.pow(event.acceleration.y, 2) + Math.pow(event.acceleration.z, 2)) >= 15){
+        this.delay = false;
+        this.showSnake = !this.showSnake;
+        setTimeout(() => {
+          this.delay = true;
+        }, 1000);
+      }
+    });
+  }
 
   submit(): void {
     const { email, password } = this.loginForm.getRawValue();

@@ -35,4 +35,30 @@
       </ion-fab-button>
     </ion-fab>
   </form>
+
+  <!-- <ion-button (click)="askPerm()">snake</ion-button>
+  <span>{{log}}</span> -->
+
+  <div style="display: flex; justify-content: center;flex-direction: column;margin-top: 4em;" *ngIf="showSnake">
+    <div style="display: flex; justify-content: center;">
+      <ngx-snake #game></ngx-snake>
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <ion-button (click)="game.actionStart()">Start</ion-button>
+      <ion-button (click)="game.actionStop()">Stop</ion-button>
+      <ion-button (click)="game.actionReset()">Reset</ion-button>
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <ion-button (click)="game.actionUp()">Up</ion-button>
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <ion-button (click)="game.actionLeft()">Left</ion-button>
+      <ion-button (click)="game.actionRight()">Right</ion-button>
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <ion-button (click)="game.actionDown()">Down</ion-button>
+    </div>
+  </div>
+
+  <!-- <iframe width="100%" height="150" src="https://www.youtube.com/embed/jNQXAC9IVRw?si=Wzd6eGvaYsRK0jBd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
 </ion-content>
