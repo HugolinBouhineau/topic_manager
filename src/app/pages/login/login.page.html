@@ -14,40 +14,25 @@
 
   <form (ngSubmit)="submit()" [formGroup]="loginForm">
     <ion-list>
-        <ion-item class="input-item">
-          <ion-label aria-label="Login" position="floating">Email</ion-label>
-          <ion-input type="text" formControlName="email" clearInput required aria-label="email input"></ion-input>
-        </ion-item>
-        <div class="error-container" *ngIf="loginForm.get('email')?.invalid">
-          <span style="color: red;" *ngIf="loginForm.get('email')?.errors?.['required']">
-            Email is required
-          </span>
-        </div>
-        <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
-          Wrong credentials
-        </span>
+      <ion-item lines="none">
+        <ion-input formControlName="email" label="Email :" errorText="Email is required"></ion-input>
+      </ion-item>
 
-        <ion-item class="input-item">
-          <ion-label aria-label="Password" position="floating">Password</ion-label>
-          <ion-input type="password" formControlName="password" clearInput required aria-label="password input"></ion-input>
-        </ion-item>
-        <div class="error-container" *ngIf="loginForm.get('password')?.invalid">
-          <span style="color: red;" *ngIf="loginForm.get('password')?.errors?.['required']">
-            Password is required
-          </span>
-        </div>
-        <span style="color: red;" *ngIf="loginForm.errors?.['wrongCredentials']">
-          Wrong credentials
-        </span>
+      <ion-item lines="none">
+        <ion-input type="password" formControlName="password" label="Password :" errorText="Password is required"></ion-input>
+      </ion-item>
+
+      <span style="color: red; margin-left: 14px;" *ngIf="loginForm.errors?.['wrongCredentials']">
+        Wrong credentials
+      </span>
     </ion-list>
-    <ion-fab position="vertical" horizontal="center">
+    <ion-button type="submit" style="display: flex; align-items: center;" [disabled]="loginForm.invalid" class="submit-button">Login</ion-button>
+    <ion-button style="display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
+    <ion-button style="display: flex; align-items: center;" fill="clear" (click)="resetPassword()">I forgot my password</ion-button>
+    <ion-fab horizontal="center">
       <ion-fab-button (click)="loginWithGmail()">
         <ion-icon name="logo-google"></ion-icon>
       </ion-fab-button>
     </ion-fab>
-    <ion-button style="margin-top: 18%; display: flex; align-items: center;" fill="clear" (click)="toRegisterPage()">I don't have an account</ion-button>
-    <ion-button style="margin-top: 1%; display: flex; align-items: center;" fill="clear" (click)="resetPassword()">I forgot my password</ion-button>
-    <ion-button type="submit" style="display: flex; align-items: center;" [disabled]="loginForm.invalid" class="submit-button">Login</ion-button>
-
   </form>
 </ion-content>

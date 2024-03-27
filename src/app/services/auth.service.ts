@@ -1,14 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, sendPasswordResetEmail, sendEmailVerification } from '@angular/fire/auth';
+import { Auth, User, UserCredential, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithRedirect, sendPasswordResetEmail, sendEmailVerification, signInWithCredential } from '@angular/fire/auth';
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
+import { isPlatform } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private googleProvider = new GoogleAuthProvider();
+  constructor(private auth: Auth) { 
+    if(!isPlatform('capacitor')){
+      GoogleAuth.initialize();
+    }
+  }
 
-  constructor(private auth: Auth) { }
+  async signInWithGoogle(): Promise<any>{
+    const user = await GoogleAuth.signIn()
+    const credentials = GoogleAuthProvider.credential(user.authentication.idToken);
+    return signInWithCredential(this.auth, credentials);
+  }
 
   createUser(email: string, password: string): Promise<UserCredential>{
     return createUserWithEmailAndPassword(this.auth, email, password)
@@ -16,10 +26,6 @@ export class AuthService {
 
   signIn(email: string, password: string): Promise<UserCredential>{
     return signInWithEmailAndPassword(this.auth, email, password)
-  }
-
-  signInWithGoogle(): Promise<UserCredential>{
-    return signInWithRedirect(this.auth, this.googleProvider);
   }
 
   sendPasswordResetEmail(email: string): Promise<void> {

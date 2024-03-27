@@ -35,7 +35,7 @@ export class LoginPage {
     const { email, password } = this.loginForm.getRawValue();
     if (email && password) {
       this.authService.signIn(email, password).then(res => {
-        if (!this.authService.isConnected()?.emailVerified) {
+        if (!res.user.emailVerified) {
           this.presentToast("Your email is not verified !")
           this.authService.signOut();
         } else {
